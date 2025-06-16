@@ -1,4 +1,8 @@
 import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
+
+const SECRET_KEY = 'min-hemliga-nyckel';
+
 
 const registerUser = async (req, res) => {
   const { username, password } = req.body;
@@ -10,7 +14,16 @@ const registerUser = async (req, res) => {
   try {
     const newUser = new User({ username, password });
     await newUser.save();
-    res.json({ userId: newUser._id });
+
+    // Create JWT-token
+    const token = jwt.sign(
+      { userId: newUser._id, username: newUser.username },
+      SECRET_KEY,
+      { expiresIn: '1h' } 
+    );
+
+
+    res.json({ userId: newUser._id, token });
   } catch (err) {
     res.status(500).json({ error: 'Kunde inte skapa användare' });
   }
