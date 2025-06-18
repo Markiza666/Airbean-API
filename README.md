@@ -94,7 +94,7 @@ npm install
 npm start
 ```
 
-The server will now be running on http://localhost:3000 (or the port you specified in your .env file).
+The server will now be running on [http://localhost:3000](http://localhost:3000) (or the port you specified in your .env file).
 
 ## API Endpoints
 
@@ -156,4 +156,3 @@ Here's an overview of the primary API endpoints. All endpoints are prefixed with
 ├── app.js              # Main application file, server start, middleware, route configuration
 ├── package.json        # Project dependencies and scripts
 └── README.md           # This file
-
