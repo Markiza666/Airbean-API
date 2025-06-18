@@ -1,29 +1,49 @@
+// app.js
 import express from 'express';
 import dotenv from 'dotenv';
-// import connectDB from './config/db.js';
+import connectDB from './config/db.js'; 
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Import routes
-import userRoutes from './routes/usersRoutes.js';
+// Importerar rutter
+import authRoutes from './routes/authRoutes.js'; 
 import orderRoutes from './routes/orderRoutes.js';
-import productRoutes from './routes/productsRoutes.js'
+import productRoutes from './routes/productRoutes.js';
+import aboutRoutes from './routes/aboutRoutes.js'; 
 
 dotenv.config();
-// connectDB();
+
+connectDB();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-// use routes
-app.use('/api/users', userRoutes);  // För /api/users/profile, /api/users/login, /api/users/register
-app.use('/api/orders', orderRoutes);    // För /api/orders, /api/orders/:orderId/status, /api/orders/history
-app.use('/api/products',productRoutes); // För /api/menu
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
-// ME	User Story 1: Som användare vill jag se en enkel startsida med bara logotypen så att jag omedelbart känner igen varumärket. 
+// Rot-route för att testa om servern körs
 app.get('/', (req, res) => {
-    res.send('AIR BEAN');   // API:ets enkla välkomstmeddelande/namn och implicit i res.send(), Express skickar 200 OK som standard för lyckade svar
+    res.send('AIR BEAN');
+});
+// Använder rutter
+app.use('/api/auth', authRoutes);
+app.use('/api', orderRoutes);
+app.use('/api', productRoutes);
+app.use('/api/about', aboutRoutes);
+
+// Global felhantering - förblir densamma, men tänk på asynkrona fel
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: "Något gick fel på servern!" });
 });
 
-export default app; // exportera app för att kunna importera i server.js
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Server körs på port ${PORT}`);
+    console.log(`Besök http://localhost:${PORT}`);
+});
+

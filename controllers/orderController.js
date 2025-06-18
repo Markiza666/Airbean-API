@@ -1,7 +1,7 @@
 import Order from '../models/Order.js';
 import { format, addHours, isBefore, isAfter } from 'date-fns'; // Importerar datum/tid-funktioner från npm-paketet date-fns
 
-//JSDoc-kommentarer (/** ... */): Jag har lagt till JSDoc-kommentarer ovanför varje funktion som beskriver funktionen, routen, och accessnivån.
+// Jag har lagt till JSDoc-kommentarer ovanför varje funktion som beskriver funktionen, routen, och accessnivån.
 /**
  * @desc    Skapar en ny beställning
  * @route   POST /api/orders
@@ -38,7 +38,7 @@ const createOrder = async (req, res) => {
       orderId: newOrder.orderId,
       eta: newOrder.eta.toISOString(), // ETA i standard ISO-format
       status: newOrder.status,
-      // userId: newOrder.userId, // Valfritt att inkludera, men kan vara bra för klienten
+      userId: newOrder.userId, 
       total: newOrder.total,
     });
 
@@ -47,8 +47,6 @@ const createOrder = async (req, res) => {
     res.status(500).json({ error: "Ett serverfel uppstod när beställningen skulle skapas. Försök igen senare." });
   }
 };
- 
-
 
 /**
  * @desc    Hämtar status för en specifik beställning
@@ -59,25 +57,23 @@ const getOrderStatus = async (req, res) => {
   const userId = req.user.userId; // Hämta användar-ID från autentiserad token
   const { orderId } = req.params; // Hämta order-ID från URL-parametrarna
 
-  try {
-    // 1. Hitta beställningen i databasen
+  try { // Hitta beställningen i databasen
     // Sök efter beställningen med både användar-ID och order-ID för att säkerställa att användaren äger ordern.
     const order = await Order.findOne({ userId, orderId });
 
-    // 2. Hantera om beställningen inte hittas
+    // Hantera om beställningen inte hittas
     if (!order) {
       return res.status(404).json({ error: "Beställningen hittades inte eller tillhör inte dig." });
     }
 
-    // 3. Beräkna aktuell tid och hämta relevanta tidsstämplar från beställningen
+    // Beräkna aktuell tid och hämta relevanta tidsstämplar från beställningen
     const now = new Date();
     const etaTime = new Date(order.eta);
     const orderedAtTime = new Date(order.orderedAt);
 
-    let currentStatus = order.status;    // Starta med den status som finns i DB
-    let deliveryMessage = "";            // Meddelande till användaren om leverans
-
-    // 4. Logik för att bestämma den *visade* statusen och meddelandet dynamiskt
+    let currentStatus = order.status;    
+    let deliveryMessage = "";
+    // Logik för att bestämma den *visade* statusen och meddelandet dynamiskt
     if (order.status === "Delivered") {
       // Om status redan är "Delivered" i DB
       deliveryMessage = "Din beställning är levererad!";
@@ -92,7 +88,7 @@ const getOrderStatus = async (req, res) => {
       deliveryMessage = "Din beställning är levererad!";
     }
 
-    // 5. Skicka tillbaka den detaljerade orderstatusen till klienten
+    // Skicka tillbaka den detaljerade orderstatusen till klienten
     res.json({
       orderId: order.orderId,
       status: currentStatus, // Den dynamiskt bestämda statusen
@@ -119,14 +115,13 @@ const getOrderStatus = async (req, res) => {
 const getOrderHistory = async (req, res) => {
   const userId = req.user.userId; // Hämta användar-ID från autentiserad token
 
-  try {
-    // 1. Hämta alla beställningar för det specifika användar-ID:t
+  try {    // Hämta alla beställningar för det specifika användar-ID:t
     // Använder .sort({ orderedAt: -1 }) för att få de senaste beställningarna först.
     const orders = await Order.find({ userId }).sort({ orderedAt: -1 });
 
     const now = new Date(); // Aktuell tid för dynamisk statusberäkning
 
-    // 2. Bearbeta varje beställning för att formatera data och bestämma visningsstatus
+    // Bearbeta varje beställning för att formatera data och bestämma visningsstatus
     const processedOrders = orders.map(order => {
       const etaTime = new Date(order.eta);
       const orderedAtTime = new Date(order.orderedAt);
@@ -137,7 +132,7 @@ const getOrderHistory = async (req, res) => {
         statusDisplay = "Levererad";
       }
 
-      // 3. Returnera ett objekt med de relevanta detaljerna för historikvisning
+      // Returnera ett objekt med de relevanta detaljerna för historikvisning
       return {
         orderId: order.orderId,
         items: order.items,                      // Alla beställda varor
@@ -149,11 +144,11 @@ const getOrderHistory = async (req, res) => {
       };
     });
 
-    // 4. Skicka tillbaka den bearbetade beställningshistoriken
+    // Skicka tillbaka den bearbetade beställningshistoriken
     res.json(processedOrders);
 
   } catch (error) {
-    // 5. Felhantering
+    // Felhantering
     console.error("Fel vid hämtning av orderhistorik:", error.message);
     res.status(500).json({ error: "Ett serverfel uppstod vid hämtning av orderhistorik." });
   }
