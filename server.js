@@ -2,12 +2,12 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import app from './app.js';
 
-dotenv.config(); // se till att miljövariabler laddas
+dotenv.config(); // Load variables
 
-console.log(' Mongo URI:', process.env.MONGO_URI); // För att se att den laddas korrekt
+console.log(' Mongo URI:', process.env.MONGO_URI); // Check if it loads correctly
 const PORT = 3000;
 
-// Koppla till MongoDB och starta servern när kopplingen är klar
+// Connect to MongoDB and start server when connect is done
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
