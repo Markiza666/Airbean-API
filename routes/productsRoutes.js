@@ -1,12 +1,7 @@
-import express from 'express';
-import productController from '../controllers/productController.js';
-import { getMenu } from '../controllers/productController.js';
+import express from 'express'; 
+const router = express.Router(); 
+import { getMenu } from '../controllers/productController.js'; // Named import 
 
+router.get('/menu', getMenu); 
 
-
-const router = express.Router();
-
-router.get('/', productController.getProducts,'/menu', getMenu);
-
-
-export default router;
+export default router; // 
