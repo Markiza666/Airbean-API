@@ -9,29 +9,46 @@ import { format, addHours, isBefore, isAfter } from 'date-fns'; // Importerar da
  */
 
 const createOrder = async (req, res) => {
-  const { userId, items } = req.body;
+  const userId = req.user.userId;
+  const { items, deliveryAddress} = req.body;
 
-  if (!userId || !items || !Array.isArray(items)) {
-    return res.status(400).json({ error: 'Felaktig data' });
+  if (!items || !Array.isArray(items) || items.length===0) {
+    return res.status(400).json({ error: 'Beställningen måste innehålla minst en vara' });
   }
 
+  if (!deliveryAddress || typeof deliveryAddress !== 'object' || !deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.zip) {
+    return res.status(400).json({ error: 'Leveransadress är obligatorisk och måste vara komplett (gata, stad, postnummer'})}
   try {
     const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-    const newOrder = new Order({
-      userId, 
-      items,
-      total,
-      deliveryAddress, 
-      orderedAt: new Date(),
-      status: 'Pending',
-      eta: addHours(new Date(), 0.5), 
+      const orderId =`order-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const newOrder = await Order.create({
+      userId,                    // Användar-ID från autentiserad token
+      orderId,                   // Det unika, genererade order-ID:t
+      items,                     // De validerade beställda varorna
+      total,                     // Det beräknade totalpriset
+      deliveryAddress,           // Leveransadressen
+      orderedAt: new Date(),     // Tidpunkt då ordern skapades
+      status: "Pending",         // Initial status för beställningen
+      eta: addHours(new Date(), 0.5), // Beräknad ETA: nuvarande tid + 30 minuter
     });
-    await newOrder.save();
-    res.json({ orderId: newOrder._id });
-  } catch (err) {
-    res.status(500).json({ error: 'Kunde inte skapa order' });
+
+    res.status(201).json({
+      message: "Din beställning är nu skickad!",
+      orderId: newOrder.orderId,
+      eta: newOrder.eta.toISOString(), // ETA i standard ISO-format
+      status: newOrder.status,
+      // userId: newOrder.userId, // Valfritt att inkludera, men kan vara bra för klienten
+      total: newOrder.total,
+    });
+
+  } catch (error) {
+    console.error("Fel vid skapande av beställning:", error.message);
+    res.status(500).json({ error: "Ett serverfel uppstod när beställningen skulle skapas. Försök igen senare." });
   }
 };
+ 
+
 
 /**
  * @desc    Hämtar status för en specifik beställning
