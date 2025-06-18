@@ -1,3 +1,2 @@
-PORT=3000
-JWT_SECRET= Markiza#18&14/03%03?28#12
-MONGO_URI=mongodb://localhost:27017/airbean
+.env
+node_modules

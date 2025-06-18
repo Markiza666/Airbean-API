@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 // import connectDB from './config/db.js';
 
 // Import routes
-import userRoutes from './routes/users.js';
-import orderRoutes from './routes/orders.js';
-import productRoutes from './routes/products.js'
+import userRoutes from './routes/usersRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import productRoutes from './routes/productsRoutes.js'
 
 dotenv.config();
 // connectDB();
