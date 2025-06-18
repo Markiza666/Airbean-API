@@ -20,17 +20,18 @@ const createOrder = async (req, res) => {
     return res.status(400).json({ error: 'Leveransadress är obligatorisk och måste vara komplett (gata, stad, postnummer'})}
   try {
     const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
-      const orderId =`order-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+    const orderId =`order-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     const newOrder = await Order.create({
-      userId,                    // Användar-ID från autentiserad token
-      orderId,                   // Det unika, genererade order-ID:t
-      items,                     // De validerade beställda varorna
-      total,                     // Det beräknade totalpriset
-      deliveryAddress,           // Leveransadressen
-      orderedAt: new Date(),     // Tidpunkt då ordern skapades
-      status: "Pending",         // Initial status för beställningen
-      eta: addHours(new Date(), 0.5), // Beräknad ETA: nuvarande tid + 30 minuter
+      userId,                    
+      orderId,                   
+      items,                     
+      total,                     
+      deliveryAddress,          
+      orderedAt: new Date(),     
+      status: "Pending",         
+      eta: addHours(new Date(), 0.5), 
     });
 
     res.status(201).json({
@@ -54,14 +55,12 @@ const createOrder = async (req, res) => {
  * @access  Private (kräver autentisering)
  */
 const getOrderStatus = async (req, res) => {
-  const userId = req.user.userId; // Hämta användar-ID från autentiserad token
-  const { orderId } = req.params; // Hämta order-ID från URL-parametrarna
+  const userId = req.user.userId; 
+  const { orderId } = req.params; 
 
-  try { // Hitta beställningen i databasen
-    // Sök efter beställningen med både användar-ID och order-ID för att säkerställa att användaren äger ordern.
+  try { 
     const order = await Order.findOne({ userId, orderId });
 
-    // Hantera om beställningen inte hittas
     if (!order) {
       return res.status(404).json({ error: "Beställningen hittades inte eller tillhör inte dig." });
     }
@@ -75,33 +74,28 @@ const getOrderStatus = async (req, res) => {
     let deliveryMessage = "";
     // Logik för att bestämma den *visade* statusen och meddelandet dynamiskt
     if (order.status === "Delivered") {
-      // Om status redan är "Delivered" i DB
       deliveryMessage = "Din beställning är levererad!";
     } else if (isBefore(now, etaTime)) {
-      // Om aktuell tid är FÖRE den uppskattade leveranstiden (ETA)
-      currentStatus = "Pågående"; // Uppdaterar status för visning
+      currentStatus = "Pågående";
       deliveryMessage = `Förväntad leverans: ${format(etaTime, 'HH:mm')}`;
     } else {
-      // Om aktuell tid är EFTER den uppskattade leveranstiden (ETA) och den inte är "Delivered" i DB
-      // Antar vi att den borde vara levererad. (I en verklig app skulle status uppdateras på serversidan av t.ex. en leveransprocess)
-      currentStatus = "Levererad"; // Uppdaterar status för visning
+      currentStatus = "Levererad";
       deliveryMessage = "Din beställning är levererad!";
     }
 
     // Skicka tillbaka den detaljerade orderstatusen till klienten
     res.json({
       orderId: order.orderId,
-      status: currentStatus, // Den dynamiskt bestämda statusen
+      status: currentStatus, 
       eta: order.eta.toISOString(), // ETA i ISO-format
       deliveryMessage,
-      orderedAt: format(orderedAtTime, 'yyyy-MM-dd HH:mm:ss'), // Beställningstidpunkt formaterad
-      items: order.items, // Inkludera beställda varor
-      total: order.total, // Inkludera totalpris
-      deliveryAddress: order.deliveryAddress, // Inkludera leveransadress
+      orderedAt: format(orderedAtTime, 'yyyy-MM-dd HH:mm:ss'), 
+      items: order.items,
+      total: order.total, 
+      deliveryAddress: order.deliveryAddress, 
     });
 
   } catch (error) {
-    // 6. Felhantering
     console.error("Fel vid hämtning av orderstatus:", error.message);
     res.status(500).json({ error: "Ett serverfel uppstod vid hämtning av orderstatus." });
   }
@@ -115,24 +109,20 @@ const getOrderStatus = async (req, res) => {
 const getOrderHistory = async (req, res) => {
   const userId = req.user.userId; // Hämta användar-ID från autentiserad token
 
-  try {    // Hämta alla beställningar för det specifika användar-ID:t
-    // Använder .sort({ orderedAt: -1 }) för att få de senaste beställningarna först.
+  try {    
     const orders = await Order.find({ userId }).sort({ orderedAt: -1 });
 
     const now = new Date(); // Aktuell tid för dynamisk statusberäkning
 
-    // Bearbeta varje beställning för att formatera data och bestämma visningsstatus
     const processedOrders = orders.map(order => {
       const etaTime = new Date(order.eta);
       const orderedAtTime = new Date(order.orderedAt);
 
-      let statusDisplay = order.status; // Börja med statusen från DB
-      // Om ordern fortfarande är "Pending" men ETA har passerats, visa den som "Levererad" i historiken.
+      let statusDisplay = order.status; 
       if (order.status === "Pending" && isAfter(now, etaTime)) {
         statusDisplay = "Levererad";
       }
 
-      // Returnera ett objekt med de relevanta detaljerna för historikvisning
       return {
         orderId: order.orderId,
         items: order.items,                      // Alla beställda varor
