@@ -1,27 +1,21 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import app from './app.js';
+import connectDB from './config/db.js';
 
 dotenv.config();
 
-connectDB();
+const PORT = process.env.PORT || 3000; // Använder miljövariabel för port, med fallback som rekommenderas
 
-const PORT = 3000;
-
-console.log(' Mongo URI:', process.env.MONGO_URI); // Check if it loads correctly
-
-// Connect to MongoDB and start server when connect is done
-mongoose
-  .connect(process.env.MONGO_URI)
+// Anropar connectDB och startar servern när anslutningen är klar
+connectDB()
   .then(() => {
-    console.log('Connected to MongoDB ');
     app.listen(PORT, () => {
       console.log(`Server körs på port ${PORT}`);
       console.log(`Besök http://localhost:${PORT}`);
     });
   })
   .catch((err) => {
-    console.error('MongoDB Connection Error:', err.message); // Använd err.message för tydligare felmeddelande
-    process.exit(1); // Avsluta processen vid anslutningsfel
+    console.error('Initial MongoDB Connection Error (server.js):', err.message);
+    process.exit(1);
   });
-  
