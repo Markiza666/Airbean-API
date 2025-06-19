@@ -1,7 +1,9 @@
-import express from 'express'; 
+import express from 'express';  
+import asyncHandler from 'express-async-handler'; // Import express-async-handler for handling async errors
+import { getMenu } from '../controllers/productController.js'; 
+
 const router = express.Router(); 
-import { getMenu } from '../controllers/productController.js'; // Named import 
 
-router.get('/menu', getMenu); 
+router.get('/menu', asyncHandler(getMenu)); 
 
-export default router; // 
+export default router; 
