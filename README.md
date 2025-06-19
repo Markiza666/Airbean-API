@@ -154,7 +154,11 @@ Here's an overview of the primary API endpoints. All endpoints are prefixed with
 │       └── airbean_logo_placeholder.png
 ├── .env                # Environment variables (not version controlled)
 ├── .gitignore          # Files/folders to ignore in Git
-├── app.js              # Main application file, server start, middleware, route configuration
+├── server.js           # Server start
 ├── package.json        # Project dependencies and scripts
 └── README.md           # This file
 ```
+
+## License
+
+This project is licensed under the MIT License. See the LICENSE file for more details.
