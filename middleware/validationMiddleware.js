@@ -5,14 +5,8 @@ const validateString = (value, fieldName) => {
     return null; 
     }; 
 
-const validateNumber = (value, fieldName) => { 
-    if (typeof value !== 'number' || value <= 0) { 
-        return `${fieldName} måste vara ett positivt nummer.`; 
-    } return null;
-}; 
-
 // Validering för registrering 
-export const validateRegistration = (req, res, next) => { 
+const validateRegistration = (req, res, next) => { 
     const { username, password } = req.body; 
 
     let error = validateString(username, 'Användarnamn'); 
@@ -21,15 +15,34 @@ export const validateRegistration = (req, res, next) => {
     error = validateString(password, 'Lösenord'); 
     if (error) return res.status(400).json({ error }); 
 
-    if (password.length < 6) { 
-        return res.status(400).json({ error: "Lösenordet måste vara minst 6 tecken långt." }); 
+    if (password.length < 8) {  // Ökat till minst 8 tecken för bättre säkerhet
+        return res.status(400).json({ error: "Lösenordet måste vara minst 8 tecken långt." }); 
     } 
+
+    // Nya regex-regler för lösenordskomplexitet:
+    // Regex för minst en versal (A-Z)
+    if (!/[A-Z]/.test(password)) {
+        return res.status(400).json({ error: "Lösenordet måste innehålla minst en versal bokstav." });
+    }
+    // Regex för minst en liten bokstav (a-z) - ofta bra att ha om man kräver versal
+    if (!/[a-z]/.test(password)) {
+        return res.status(400).json({ error: "Lösenordet måste innehålla minst en liten bokstav." });
+    }
+    // Regex för minst en siffra (0-9)
+    if (!/[0-9]/.test(password)) {
+        return res.status(400).json({ error: "Lösenordet måste innehålla minst en siffra." });
+    }
+    // Regex för minst ett specialtecken (t.ex. !@#$%^&*)
+    // Du kan anpassa vilka specialtecken du tillåter/kräver
+    if (!/[!@#$%^&*]/.test(password)) {
+        return res.status(400).json({ error: "Lösenordet måste innehålla minst ett specialtecken (!@#$%^&*)." });
+    }
 
     next(); 
 }; 
 
 // Validering för inloggning 
-export const validateLogin = (req, res, next) => {  
+const validateLogin = (req, res, next) => {  
     const { username, password } = req.body; 
 
     let error = validateString(username, 'Användarnamn'); 
@@ -42,14 +55,14 @@ export const validateLogin = (req, res, next) => {
 }; 
 
 // Validering för ny order 
-export const validateNewOrder = (req, res, next) => {
-    const { order } = req.body; 
+const validateNewOrder = (req, res, next) => {
+    const { items } = req.body; 
 
-    if (!Array.isArray(order) || order.length === 0) { 
+    if (!Array.isArray(items) || items.length === 0) { 
         return res.status(400).json({ error: "Beställningen måste vara en icke-tom array av produkter." });
     } 
 
-    for (const item of order) { 
+    for (const item of items) { 
         const { product, quantity } = item; 
         if (!product || typeof product !== 'object' || !product.id || !product.title || typeof product.price !== 'number') { 
             return res.status(400).json({ error: "Varje produkt i beställningen måste ha id, title och price som nummer." }); 

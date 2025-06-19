@@ -1,7 +1,8 @@
 import menuData from '../data/menu.json' assert { type: 'json' };
 
-export const validateMenuAndPrices = async (req, res, next) => {
-    const orderedItems = req.body.order;    
+const validateMenuAndPrices = async (req, res, next) => {
+    const orderedItems = req.body.items; 
+
     if (!orderedItems || !Array.isArray(orderedItems) || orderedItems.length === 0) { 
         return res.status(400).json({ error: "Beställningen är ogiltig eller tom." }); 
     } 
@@ -29,3 +30,5 @@ export const validateMenuAndPrices = async (req, res, next) => {
     }
     next();
 };
+
+export default validateMenuAndPrices;

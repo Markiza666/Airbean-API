@@ -7,8 +7,22 @@ import { validateMenuAndPrices } from '../middleware/menuValidationMiddleware.js
 
 const router = express.Router();
 
-router.post('/orders', authenticateToken, validateNewOrder, validateMenuAndPrices, asyncHandler(createOrder));
-router.get('/orders/:orderId/status', authenticateToken, asyncHandler(getOrderStatus));
-router.get('/orders/history', authenticateToken,asyncHandler(getOrderHistory));
+router.post(
+    '/orders',
+    authenticateToken,  // Kontrollerar att användaren är inloggad
+    validateNewOrder,   // Kontrollerar att ordern har korrekt struktur och typer
+    validateMenuAndPrices,  // Kontrollersr att ordern innehåll matchar menyn och priserna
+    asyncHandler(createOrder)   // Skapar ordern om allr ovan är ok
+);
+router.get(
+    '/orders/:orderId/status',
+    authenticateToken, 
+    asyncHandler(getOrderStatus)
+);
+router.get(
+    '/orders/history', 
+    authenticateToken,
+    asyncHandler(getOrderHistory)
+);
 
 export default router; 
