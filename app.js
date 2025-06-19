@@ -1,4 +1,3 @@
-// app.js
 import express from 'express';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js'; 
@@ -10,10 +9,6 @@ import authRoutes from './routes/authRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import aboutRoutes from './routes/aboutRoutes.js'; 
-
-dotenv.config();
-
-connectDB();
 
 const app = express();
 
@@ -40,10 +35,4 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Något gick fel på servern!" });
 });
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-    console.log(`Server körs på port ${PORT}`);
-    console.log(`Besök http://localhost:${PORT}`);
-});
-
+export default app;
