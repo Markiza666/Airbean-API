@@ -1,16 +1,16 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';   // Import express-async-handler for handling async errors
 import { createOrder, getOrderStatus, getOrderHistory } from '../controllers/orderController.js';
-import { authenticateToken } from '../middleware/authMiddleware.js'; 
-import { validateNewOrder } from '../middleware/validationMiddleware.js'; 
-import { validateMenuAndPrices } from '../middleware/menuValidationMiddleware.js'; 
+import authenticateToken from '../middleware/authMiddleware.js'; 
+import validationMiddleware from '../middleware/validationMiddleware.js'; 
+import validateMenuAndPrices from './../middleware/menuValidationMiddleware.js';
 
 const router = express.Router();
 
 router.post(
     '/orders',
     authenticateToken,  // Kontrollerar att användaren är inloggad
-    validateNewOrder,   // Kontrollerar att ordern har korrekt struktur och typer
+    validationMiddleware.validateNewOrder,   // Kontrollerar att ordern har korrekt struktur och typer
     validateMenuAndPrices,  // Kontrollersr att ordern innehåll matchar menyn och priserna
     asyncHandler(createOrder)   // Skapar ordern om allr ovan är ok
 );

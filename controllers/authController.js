@@ -2,7 +2,8 @@ import User from '../models/User.js';
 import bcrypt from 'bcryptjs'; // För lösenordshashning
 import jwt from 'jsonwebtoken'; // För JWT skapande
 // Använder uuidv4 för att generera unika användar-ID:n
-import { v4 as uuidv4 } from 'uuidv4'; // Kontrollera om uuidv4 är ett separat paket eller om det är ett skrivfel i importen för standard uuid paketet.
+import { v4 as uuidv4 } from 'uuid'; // Kontrollera om uuidv4 är ett separat paket eller om det är ett skrivfel i importen för standard uuid paketet.
+
 
 
 const register = async (req, res) => { 

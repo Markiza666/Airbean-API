@@ -159,4 +159,4 @@ const getOrderHistory = async (req, res) => {
   }
 };
 
-export default { createOrder, getOrderStatus, getOrderHistory };
+export { createOrder, getOrderStatus, getOrderHistory };
