@@ -9,9 +9,6 @@ const logger = winston.createLogger({
     ),
     transports: [
         new winston.transports.Console(), // Logga till konsolen
-        // I produktion kanske du vill logga till en fil eller en extern tjänst:
-        // new winston.transports.File({ filename: 'error.log', level: 'error' }),
-        // new winston.transports.File({ filename: 'combined.log' }),
     ],
 });
 
