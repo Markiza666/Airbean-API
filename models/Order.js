@@ -21,7 +21,7 @@ const orderItemSchema = mongoose.Schema({
 // Detta är huvudschemat för hela ordern.
 const OrderSchema = mongoose.Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId, // Bättre att använda ObjectId för userId
+    type: String, 
     required: true,
     ref: 'User'
   },
@@ -54,7 +54,7 @@ const OrderSchema = mongoose.Schema({
   deliveryAddress: { 
     street: { type: String, required: true, trim: true },
     city: { type: String, required: true, trim: true },
-    zip: { type: String, required: true, trim: true }
+    zipCode: { type: String, required: true, trim: true }
   }
 },
 {

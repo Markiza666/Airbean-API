@@ -21,7 +21,7 @@ const authenticateToken = (req, res, next) => {
             logger.warn(`Token verifiering misslyckades för IP: ${req.ip || 'okänd'} - Typ: ${err.name}, Meddelande: ${err.message}`); 
             return res.status(403).json({ error: "Ogiltig eller utgången token." }); 
         } 
-        req.user = user; 
+        req.user = user;  // 'user' här är den avkodade payloaden från JWT
         next(); 
     }); 
 };

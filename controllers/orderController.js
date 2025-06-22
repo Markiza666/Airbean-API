@@ -17,7 +17,7 @@ const createOrder = async (req, res) => {
     return res.status(400).json({ error: 'Beställningen måste innehålla minst en vara' });
   }
 
-  if (!deliveryAddress || typeof deliveryAddress !== 'object' || !deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.zip) {
+  if (!deliveryAddress || typeof deliveryAddress !== 'object' || !deliveryAddress.street || !deliveryAddress.city || !deliveryAddress.zipCode) {
     return res.status(400).json({ error: 'Leveransadress är obligatorisk och måste vara komplett (gata, stad, postnummer'})
   }
   // Validerar att 'items' arrayen innehåller objekt med 'product' och 'quantity' och att 'product' har ett 'price'. Annars kan reduce-funktionen krascha eller ge felaktiga totaler.
@@ -126,16 +126,21 @@ const getOrderHistory = async (req, res) => {
   const userId = req.user.userId; // Hämta användar-ID från autentiserad token
 
   try {   
-    // Sorterar efter senast beställda först
+    // Hämtar alla ordrar för användaren, sorterade efter senast beställda
     const orders = await Order.find({ userId }).sort({ orderedAt: -1 });
 
     const now = new Date(); // Aktuell tid för dynamisk statusberäkning
+
+    // Beräkna den totala summan användaren spenderat över alla ordrar
+    // Använder reduce för att iterera över 'orders' arrayen och summera 'total' för varje order.
+    const totalAmountSpent = orders.reduce((sum, order) => sum + order.total, 0);
 
     const processedOrders = orders.map(order => {
       const etaTime = new Date(order.eta);
       const orderedAtTime = new Date(order.orderedAt);
 
       let statusDisplay = order.status; 
+      // Uppdaterar status till "Levererad" om ETA har passerat och den fortfarande är "Pending"
       if (order.status === "Pending" && isAfter(now, etaTime)) {
         statusDisplay = "Levererad";
       }
@@ -151,7 +156,11 @@ const getOrderHistory = async (req, res) => {
       };
     });
 
-    res.json(processedOrders);
+    // Skicka tillbaka den bearbetade orderhistoriken OCH den totala summan spenderad
+    res.json({
+        history: processedOrders, // En array med alla enskilda ordrar
+        totalAmountSpent: totalAmountSpent // Den nya totala summan
+    });
 
   } catch (error) {
     console.error("Fel vid hämtning av orderhistorik:", error.message);
