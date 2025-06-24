@@ -16,7 +16,7 @@ const getAboutInfo = (req, res) => {
             ownerInfo: {
                 name: "Eva Cortado", 
                 role: "VD & Grundare", 
-                imageUrl: "/images/owner.jpg"
+                imageUrl: "/images/owner.svg"
             }
         };
 
