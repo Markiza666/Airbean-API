@@ -1,7 +1,7 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
-import { getUserProfile, updateUserProfile } from '../controllers/userController.js'; // Importera endast user-funktioner
-import authenticateToken from '../middleware/authMiddleware.js'; // För autentisering
+import { getUserProfile, updateUserProfile } from '../controllers/userController.js'; // Import user profile functions only
+import authenticateToken from '../middleware/authMiddleware.js'; // For authentication
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 /**
- * @desc    Hämtar statisk information för "Om"-sidan
+ * @desc    Get static information for about-page 
  * @route   GET /api/about
- * @access  Public (ingen autentisering krävs)
+ * @access  Public (no authentication needed)
  */
 const getAboutInfo = (req, res) => {
     try {
@@ -14,8 +14,8 @@ const getAboutInfo = (req, res) => {
                 Roast id macchiato, single shot siphon mazagran milk fair trade est aroma a half and half and, so, galão iced to go, whipped as cream cup pumpkin spice iced. At extra, rich grinder, brewed to go, steamed half and half at, that, percolator macchiato trifecta and body as arabica dripper. In galão black java milk sit trifecta, robusta, acerbic café au lait instant shop latte. Seasonal bar shop filter aroma id, crema, affogato viennese cultivar aftertaste, seasonal, percolator cream black, galão flavour, milk aromatic turkish skinny crema.
             `,
             ownerInfo: {
-                name: "Eva Cortado", 
-                role: "VD & Grundare", 
+                name: "Eva Cortado",
+                role: "VD & Grundare",
                 imageUrl: "/images/owner.svg"
             }
         };

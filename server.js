@@ -4,9 +4,10 @@ import connectDB from './config/db.js';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 3000; // Använder miljövariabel för port, med fallback som rekommenderas
+const PORT = process.env.PORT || 3000; // Environment variable for port
 
-// Anropar connectDB och startar servern när anslutningen är klar
+// Executes connectDB and start server once connection is established
+
 connectDB()
   .then(() => {
     app.listen(PORT, () => {

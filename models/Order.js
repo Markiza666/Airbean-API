@@ -1,65 +1,62 @@
 import mongoose from 'mongoose';
 
-// Detta är schemat för EN ENKEL vara/produkt som ligger inom en order.
+// Schema for a SINGLE item/product within an order
 const orderItemSchema = mongoose.Schema({
-  product: { 
-    id: { type: String, required: true },    
-    title: { type: String, required: true }, 
-    desc: { type: String, required: false }, 
-    price: { type: Number, required: true }, 
+  product: {
+    id: { type: String, required: true },
+    title: { type: String, required: true },
+    desc: { type: String, required: false },
+    price: { type: Number, required: true },
   },
   quantity: {
     type: Number,
     required: true,
-    min: 1, // Måste vara minst 1
+    min: 1, // At least 1
   },
-}, { _id: false }); // Lägger till { _id: false } om du INTE vill ha ett unikt _id för varje orderItem.
-                    // Om varje item ska kunna refereras unikt i arrayen, ta bort _id:false.
-                    // För inbäddade listor är _id: false vanligt för att spara utrymme.
+}, { _id: false }); // Omit if each orderItem needs a unique _id
 
-
-// Detta är huvudschemat för hela ordern.
+// Main schema for the entire order
 const OrderSchema = mongoose.Schema({
   userId: {
-    type: String, 
+    type: String,
     required: true,
     ref: 'User'
   },
-  orderId: { // Ditt egna genererade order-ID (t.ex. order-timestamp-random)
+  orderId: { //  Custom generated order ID (e.g., timestamp-random)
     type: String,
     required: true,
     unique: true
   },
-  
-  items: [orderItemSchema], 
 
-  total: { // Totalt belopp för ordern
+  items: [orderItemSchema],
+
+  total: { // Total amount
     type: Number,
     required: true,
-    min: 0 // Totalen kan inte vara negativ
+    min: 0 // Total can not be empty
   },
-  orderedAt: { // När ordern skapades (ofta används istället for 'date' för tydlighet)
+  orderedAt: {
     type: Date,
     default: Date.now
   },
-  status: { 
+  status: {
     type: String,
-    enum: ['Pending', 'Processing', 'Delivered', 'Cancelled'], // Tillåter endast dessa värden
+    enum: ['Pending', 'Processing', 'Delivered', 'Cancelled'], // Allows only these values 
     default: 'Pending'
   },
-  eta: { 
+  eta: {
     type: Date,
-    required: true 
+    required: true
   },
-  deliveryAddress: { 
+  deliveryAddress: {
     street: { type: String, required: true, trim: true },
     city: { type: String, required: true, trim: true },
     zipCode: { type: String, required: true, trim: true }
   }
 },
-{
-  timestamps: true // Lägger automatiskt till `createdAt` och `updatedAt`
-});
+  {
+    timestamps: true // Automatically adds `createdAt` och `updatedAt`
+  });
 
 const Order = mongoose.model('Order', OrderSchema);
 export default Order;

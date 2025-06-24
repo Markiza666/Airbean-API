@@ -2,12 +2,12 @@ import mongoose from 'mongoose';
 
 const ProductSchema = mongoose.Schema(
   {
-    // Unikt ID för produkten (ofta samma som _id från MongoDB, men kan vara en egen specifik om önskas)
+    // Unique ID for product
     productId: {
       type: String,
       required: true,
       unique: true,
-      trim: true // Trimmar bort vita mellanslag från början och slutet
+      trim: true // Removes whitespace from the beginning and end of the string
     },
     title: {
       type: String,
@@ -16,21 +16,21 @@ const ProductSchema = mongoose.Schema(
     },
     desc: {
       type: String,
-      required: false, // Beskrivning är valfri
+      required: false, // Optional description
       trim: true
     },
     price: {
       type: Number,
       required: true,
-      min: 0 // Priset kan inte vara negativt
+      min: 0 // Price can not be negative
     },
   },
   {
-    timestamps: true // Lägger automatiskt till createdAt och updatedAt
+    timestamps: true // Automatically adds createdAt and updatedAt
   }
 );
 
-// Skapar Mongoose-modellen
+// Create Mongoose model
 const Product = mongoose.model('Product', ProductSchema);
 
 export default Product;

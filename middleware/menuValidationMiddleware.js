@@ -1,54 +1,53 @@
-import fs from 'fs';   // Importerar Node.js File System module
-import path from 'path'; // Importerar Node.js Path-modul för sökvägshantering
-import { fileURLToPath } from 'url'; // För att få __dirname-funktionalitet i ES Modules
+import fs from 'fs';   // Imports Node.js File System module
+import path from 'path'; // Imports Node.js Path-module for path management
+import { fileURLToPath } from 'url'; // To get __dirname functionality in ES Modules
 
-// --- Standardkod för att få __dirname-motsvarighet i ES Modules ---
+// To get__dirname equivalent in ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// --- Slut på standardkod ---
 
-// Konstruera sökvägen till din menu.json-fil
+
+// Construct the path to your menu.json file
 const menuPath = path.join(__dirname, '../data/menu.json');
 
-// Läs in och tolka JSON-datan synkront vid uppstart
+//Read and parse the JSON data synchronously during startup
 let menuData = [];
 try {
-    const rawData = fs.readFileSync(menuPath, 'utf8'); // Läs in filen som en sträng
-    menuData = JSON.parse(rawData); // Tolka strängen som JSON
-    console.log('Menydata laddad korrekt i valideringsmiddleware.'); // Valfritt: för felsökning
+    const rawData = fs.readFileSync(menuPath, 'utf8'); // Read file as a string
+    menuData = JSON.parse(rawData); // Parse the string as JSON
+    console.log('Menydata laddad korrekt i valideringsmiddleware.'); // For debugging
 } catch (error) {
     console.error('Fel vid laddning av menydata i valideringsmiddleware:', error);
-    // Om kritisk data som menyn inte kan laddas, är det bäst att avsluta processen
+    // If not loaded, exit the process
     process.exit(1);
 }
 
-// Nu kan valideringsfunktioner använda menuData
 const validateMenuAndPrices = async (req, res, next) => {
-    const orderedItems = req.body.items; 
+    const orderedItems = req.body.items;
 
-    if (!orderedItems || !Array.isArray(orderedItems) || orderedItems.length === 0) { 
-        return res.status(400).json({ error: "Beställningen är ogiltig eller tom." }); 
-    } 
+    if (!orderedItems || !Array.isArray(orderedItems) || orderedItems.length === 0) {
+        return res.status(400).json({ error: "Beställningen är ogiltig eller tom." });
+    }
 
     const menuMap = new Map(menuData.map(item => [item.id, item]));
     for (const item of orderedItems) {
         const { product, quantity } = item;
         if (!menuMap.has(product.id)) {
-        return res.status(400).json({ error: `Produkten med ID ${product.id} finns inte i menyn.` });
+            return res.status(400).json({ error: `Produkten med ID ${product.id} finns inte i menyn.` });
         }
 
         const menuItem = menuMap.get(product.id);
-        if (product.title !== menuItem.title) { 
-            return res.status(400).json({ error: `Titeln för produkt ${product.id} matchar inte menyn.` }); 
-        } 
+        if (product.title !== menuItem.title) {
+            return res.status(400).json({ error: `Titeln för produkt ${product.id} matchar inte menyn.` });
+        }
 
-        if (product.price !== menuItem.price) { 
-            return res.status(400).json({ error: `Priset för produkt ${product.id} (${product.price} SEK) matchar inte menyns pris (${menuItem.price} SEK).` }); 
-        } 
+        if (product.price !== menuItem.price) {
+            return res.status(400).json({ error: `Priset för produkt ${product.id} (${product.price} SEK) matchar inte menyns pris (${menuItem.price} SEK).` });
+        }
 
-        if (typeof quantity !== 'number' || quantity <= 0) { 
-            return res.status(400).json({ error: `Kvantitet för produkt ${product.id} måste vara ett positivt nummer.` }); 
-        } 
+        if (typeof quantity !== 'number' || quantity <= 0) {
+            return res.status(400).json({ error: `Kvantitet för produkt ${product.id} måste vara ett positivt nummer.` });
+        }
 
     }
     next();

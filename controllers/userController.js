@@ -1,14 +1,14 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import asyncHandler from 'express-async-handler';
-import logger from '../config/logger.js'; // Om du använder din logger
+import logger from '../config/logger.js';
 
 // Get User Profile
 // GET /api/profile
 // Private
 const getUserProfile = asyncHandler(async (req, res) => {
-    // req.user.userId kommer från authMiddleware, som är användarens _id
-    const user = await User.findById(req.user.userId).select('-password -__v'); // Exkluderar lösenord och __v
+    // req.user.userId from authMiddleware
+    const user = await User.findById(req.user.userId).select('-password -__v'); // Excludes password and __v
 
     if (!user) {
         logger.error(`Kunde inte hitta användarprofil för ID: ${req.user.userId}. Token kan vara föråldrad/felaktig.`);
@@ -27,7 +27,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
 // PATCH /api/profile
 // Private
 const updateUserProfile = asyncHandler(async (req, res) => {
-    const userId = req.user.userId; // Detta är användarens MongoDB _id från JWT payloaden
+    const userId = req.user.userId; // Users MongoDB _id from JWT payload
     const { currentPassword, newPassword, username } = req.body;
 
     const user = await User.findById(userId);
@@ -37,7 +37,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'Användaren hittades inte.' });
     }
 
-    // Hantera lösenordsbyte om...
+    // Change password
     if (newPassword) {
         if (!currentPassword) {
             return res.status(400).json({ message: 'Nuvarande lösenord krävs för att byta lösenord.' });
@@ -58,7 +58,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         logger.info(`Lösenord uppdaterat för användare: ${user.username} (ID: ${userId})`);
     }
 
-    // Hantera uppdatering av användarnamn om ...
+    // Update username
     if (username && user.username !== username) {
         const userExists = await User.findOne({ username });
         if (userExists && userExists._id.toString() !== userId.toString()) {
@@ -80,4 +80,4 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     });
 });
 
-export { getUserProfile, updateUserProfile }; // Exporterar endast profilfunktioner
+export { getUserProfile, updateUserProfile }; // Export only profile functions

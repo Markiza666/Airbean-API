@@ -1,4 +1,4 @@
-// Nödvändig för alla User Stories som interagerar med databasen (användare, ordrar).
+// To interact with database (users, orders)
 import mongoose from 'mongoose';
 
 const connectDB = async () => {

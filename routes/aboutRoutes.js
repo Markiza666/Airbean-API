@@ -3,6 +3,6 @@ import getAboutInfo from '../controllers/aboutController.js';
 
 const router = express.Router();
 
-router.get('/about', getAboutInfo); // Routen är definierad
+router.get('/about', getAboutInfo); // Define route
 
 export default router;
