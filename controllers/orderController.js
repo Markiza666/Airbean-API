@@ -49,6 +49,7 @@ const createOrder = async (req, res) => {
       status: newOrder.status,
       userId: newOrder.userId,
       total: newOrder.total,
+      deliveryAddress: newOrder.deliveryAddress,
     });
 
   } catch (error) {
